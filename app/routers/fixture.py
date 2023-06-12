@@ -1,0 +1,197 @@
+import datetime
+from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
+import httpx
+import schedule
+import time
+from sqlalchemy.orm import Session
+from sqlalchemy import exists 
+from .. import models, schemas, utils
+from ..database import get_db
+
+router = APIRouter(
+    prefix="/fixtures", 
+    tags=["Fixtures"]
+)
+
+@router.get("/{league_id}")
+async def create_fixture(league_id: int, db: Session = Depends(get_db)):
+    url = "https://v3.football.api-sports.io/fixtures"
+    params = {
+        "league": league_id,
+        "season": "2022"
+    }
+    headers = {
+        "x-apisports-key": "6a2ebf0bfe57befbe03765041d991643"
+    }
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url, params=params, headers=headers)
+
+    data = response.json()
+    fixtures = data['response']
+
+    existing_fixture_ids = set(db.query(models.Fixture.fixture_id).all())
+    rows = []
+
+    for fixture in fixtures:
+        fixture_id = fixture['fixture']['id']
+
+        if db.query(exists().where(models.Fixture.fixture_id == fixture_id)).scalar():
+            # Skip if fixture already exists in the database
+            print(f"Fixture with fixture_id {fixture_id} already exists.")
+            continue
+
+        referee = fixture['fixture']['referee']
+        timezone = fixture['fixture']['timezone']
+        date = fixture['fixture']['date']
+        timestamp = fixture['fixture']['timestamp']
+        venue = fixture['fixture']['venue']
+        status = fixture['fixture']['status']
+        league = fixture['league']
+        teams = fixture['teams']
+        goals = fixture['goals']
+        score = fixture['score']
+
+        row = {
+            'fixture_id': fixture_id,
+            'referee': referee,
+            'timezone': timezone,
+            'date': date,
+            'timestamp': timestamp,
+            'venue_id': venue['id'],
+            'venue_name': venue['name'],
+            'venue_city': venue['city'],
+            'league_id': league['id'],
+            'league_name': league['name'],
+            'league_country': league['country'],
+            'league_logo': league['logo'],
+            'league_flag': league['flag'],
+            'league_season': league['season'],
+            'league_round': league['round'],
+            'home_team_id': teams['home']['id'],
+            'home_team_name': teams['home']['name'],
+            'home_team_logo': teams['home']['logo'],
+            'home_team_winner': teams['home']['winner'],
+            'away_team_id': teams['away']['id'],
+            'away_team_name': teams['away']['name'],
+            'away_team_logo': teams['away']['logo'],
+            'away_team_winner': teams['away']['winner'],
+            'goals_home': goals['home'],
+            'goals_away': goals['away'],
+            'score_halftime_home': score['halftime']['home'],
+            'score_halftime_away': score['halftime']['away'],
+            'score_fulltime_home': score['fulltime']['home'],
+            'score_fulltime_away': score['fulltime']['away'],
+            'score_extratime_home': score['extratime']['home'],
+            'score_extratime_away': score['extratime']['away'],
+            'score_penalty_home': score['penalty']['home'],
+            'score_penalty_away': score['penalty']['away'],
+            'status_long': status['long'],
+            'status_short': status['short'],
+            'status_elapsed': status['elapsed']
+        }
+
+        rows.append(row)
+
+    db.bulk_insert_mappings(models.Fixture, rows)
+    db.commit()
+
+    num_rows = len(rows)
+    print(f"Inserted {num_rows} rows into the database.")
+
+    return {"message": f"Inserted {num_rows} rows into the database."}
+
+
+
+#update fixtures table with in progress fixtures data
+@router.get("/")
+async def update_fixtures(db: Session = Depends(get_db)):
+    url = "https://v3.football.api-sports.io/fixtures"
+    params = {
+        "league": "188",
+        "season": "2022"
+    }
+    headers = {
+        "x-apisports-key": "6a2ebf0bfe57befbe03765041d991643"
+    }
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url, params=params, headers=headers)
+
+    data = response.json()
+    fixtures = data['response']
+
+    updated_fixtures = []
+
+    for fixture in fixtures:
+        fixture_id = fixture['fixture']['id']
+        status = fixture['fixture']['status']
+
+        if status in ['NS', 'TBD', '1H']:
+            updated_fixtures.append(fixture)
+
+    rows = []
+
+    for fixture in updated_fixtures:
+        fixture_id = fixture['fixture']['id']
+        referee = fixture['fixture']['referee']
+        timezone = fixture['fixture']['timezone']
+        date = fixture['fixture']['date']
+        timestamp = fixture['fixture']['timestamp']
+        venue = fixture['fixture']['venue']
+        status = fixture['fixture']['status']
+        league = fixture['league']
+        teams = fixture['teams']
+        goals = fixture['goals']
+        score = fixture['score']
+
+        row = {
+            'fixture_id': fixture_id,
+            'referee': referee,
+            'timezone': timezone,
+            'date': date,
+            'timestamp': timestamp,
+            'venue_id': venue['id'],
+            'venue_name': venue['name'],
+            'venue_city': venue['city'],
+            'league_id': league['id'],
+            'league_name': league['name'],
+            'league_country': league['country'],
+            'league_logo': league['logo'],
+            'league_flag': league['flag'],
+            'league_season': league['season'],
+            'league_round': league['round'],
+            'home_team_id': teams['home']['id'],
+            'home_team_name': teams['home']['name'],
+            'home_team_logo': teams['home']['logo'],
+            'home_team_winner': teams['home']['winner'],
+            'away_team_id': teams['away']['id'],
+            'away_team_name': teams['away']['name'],
+            'away_team_logo': teams['away']['logo'],
+            'away_team_winner': teams['away']['winner'],
+            'goals_home': goals['home'],
+            'goals_away': goals['away'],
+            'score_halftime_home': score['halftime']['home'],
+            'score_halftime_away': score['halftime']['away'],
+            'score_fulltime_home': score['fulltime']['home'],
+            'score_fulltime_away': score['fulltime']['away'],
+            'score_extratime_home': score['extratime']['home'],
+            'score_extratime_away': score['extratime']['away'],
+            'score_penalty_home': score['penalty']['home'],
+            'score_penalty_away': score['penalty']['away'],
+            'status_long': status['long'],
+            'status_short': status['short'],
+            'status_elapsed': status['elapsed']
+        }
+
+        rows.append(row)
+
+    if rows:
+        db.bulk_update_mappings(models.Fixture, rows)
+        db.commit()
+        print(f"Updated {len(rows)} fixtures in the database.")
+
+    return {"message": f"Updated {len(rows)} fixtures in the database."}
+
+
+
