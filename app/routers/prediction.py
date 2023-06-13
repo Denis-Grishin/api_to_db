@@ -105,7 +105,7 @@ async def update_all_predictions(db: Session = Depends(get_db)):
 
     fixtures_data = fixtures_response.json()
     fixtures = fixtures_data['response']
-
+    print(fixtures)
     # Then for each fixture_id, we call the create_prediction function
     for fixture in fixtures:
         try:
