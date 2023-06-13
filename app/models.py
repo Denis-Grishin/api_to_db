@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, TIMESTAMP, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, TIMESTAMP, ForeignKey, Double
 from sqlalchemy.orm import relationship
 from .database import Base
 from datetime import datetime
@@ -96,34 +96,37 @@ class Injuries(Base):
 class Predictions(Base):
     __tablename__ = 'api_football_predictions'
     id = Column(Integer, primary_key=True)
-    fixture_id = Column(Integer, nullable=False, unique=True) 
+    fixture_id = Column(Integer, nullable=False)
+    predictions_winner_id = Column(Integer)
+    predictions_winner_comment = Column(String)
+    predictions_win_or_draw = Column(Boolean)
+    predictions_under_over = Column(Double)
+    predictions_goals_home = Column(String)
+    predictions_goals_away = Column(String)
     predictions_advice = Column(String)
-    predictions_percent_home = Column(String) 
-    predictions_percent_draw = Column(String)
-    predictions_percent_away = Column(String) 
+    predictions_percent_draw = Column(String
+    predictions_percent_away = Column(String)
     league_id = Column(Integer)
-    league_name = Column(String) 
+    league_name = Column(String)
     league_country = Column(String)
-    league_logo = Column(String) 
+    league_logo = Column(String)
     league_flag = Column(String)
-    league_season = Column(Integer) 
+    league_season = Column(Integer)
     teams_home_id = Column(Integer)
-    teams_home_name = Column(String) 
+    teams_home_name = Column(String)
     teams_home_logo = Column(String)
-    teams_away_id = Column(Integer) 
+    teams_away_id = Column(Integer)
     teams_away_name = Column(String)
-    teams_away_logo = Column(String) 
-    comparison_form_home = Column(String)
-    comparison_form_away = Column(String) 
-    comparison_att_home = Column(String)
-    comparison_att_away = Column(String) 
-    comparison_def_home = Column(String)
-    comparison_def_away = Column(String) 
-    comparison_poisson_distribution_home = Column(String) 
-    comparison_poisson_distribution_away = Column(String) 
-    comparison_h2h_home = Column(String)
-    comparison_h2h_away = Column(String) 
-    comparison_goals_home = Column(String)
-    comparison_goals_away = Column(String)
+    teams_away_logo = Column(String)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=str('now()'))
     updated_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=str('now()'))
+
+class Prediction_Comparisons(Base):
+    __tablename__ = 'api_football_prediction_comparisons'
+    id = Column(Integer, primary_key=True)
+    prediction_id = Column(Integer, ForeignKey("api_football_predictions.id", ondelete="CASCADE"), nullable=False)
+    fixture_id = Column(Integer, nullable=False)
+    prediction_comparison_team_name = Column(String)
+    prediction_comparison_type = Column(String)
+    prediction_comparison_value = Column(String)
+    prediction = relationship("Predictions")
