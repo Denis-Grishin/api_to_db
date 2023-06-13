@@ -18,12 +18,15 @@ router = APIRouter(
 @router.get("/{fixture_id}")
 async def create_prediction(fixture_id: int, db: Session = Depends(get_db)):
     url = f"https://v3.football.api-sports.io/predictions/{fixture_id}"
+    params = {
+        "fixture": fixture_id
+    }
     headers = {
         "x-apisports-key": "6a2ebf0bfe57befbe03765041d991643"
     }
 
     async with httpx.AsyncClient() as client:
-        response = await client.get(url, headers=headers)
+        response = await client.get(url, params=params, headers=headers)
 
     data = response.json()
     prediction = data['response']
