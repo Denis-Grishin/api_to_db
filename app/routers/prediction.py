@@ -87,7 +87,7 @@ async def create_prediction(fixture_id: int, db: Session = Depends(get_db)):
     return {"message": f"Inserted {num_rows} rows into the database."}
 
 
-@router.get("/update_all")
+@router.get("/updateall")
 async def update_all_predictions(db: Session = Depends(get_db)):
     # First we get all the fixture_ids
     fixtures_url = "https://v3.football.api-sports.io/fixtures"
