@@ -85,3 +85,30 @@ async def create_prediction(fixture_id: int, db: Session = Depends(get_db)):
     print(f"Inserted {num_rows} rows into the database.")
 
     return {"message": f"Inserted {num_rows} rows into the database."}
+
+
+@router.get("/update_all")
+async def update_all_predictions(db: Session = Depends(get_db)):
+    # First we get all the fixture_ids
+    fixtures_url = "https://v3.football.api-sports.io/fixtures"
+    fixtures_params = {
+        "league": "39",
+        "season": "2022",
+        "date": "2023-05-28"
+    }
+    fixtures_headers = {
+        "x-apisports-key": "6a2ebf0bfe57befbe03765041d991643"
+    }
+
+    async with httpx.AsyncClient() as client:
+        fixtures_response = await client.get(fixtures_url, params=fixtures_params, headers=fixtures_headers)
+
+    fixtures_data = fixtures_response.json()
+    fixtures = fixtures_data['response']
+
+    # Then for each fixture_id, we call the create_prediction function
+    for fixture in fixtures:
+        fixture_id = fixture['fixture']['id']
+        await create_prediction(fixture_id, db)
+        
+    return {"message": "Updated all predictions."}
