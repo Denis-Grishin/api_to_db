@@ -110,6 +110,7 @@ async def update_all_predictions(db: Session = Depends(get_db)):
     for fixture in fixtures:
         try:
             fixture_id = int(fixture['fixture']['id'])
+            print(f"Processing fixture_id: {fixture_id}")
             await create_prediction(fixture_id, db)
         except ValueError:
             print(f"Could not convert {fixture['fixture']['id']} to an integer.")
