@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import exists, insert 
 from .. import models, schemas, utils
 from ..database import get_db
+import traceback
 
 router = APIRouter(
     prefix="/predictions", 
@@ -104,8 +105,7 @@ async def update_all_predictions(db: Session = Depends(get_db)):
         fixtures_response = await client.get(fixtures_url, params=fixtures_params, headers=fixtures_headers)
 
     fixtures_data = fixtures_response.json()
-    print(f"Fixtures API response: {fixtures_data}")
-    fixtures = fixtures_data['response']
+    fixtures = fixtures_data.get('response', [])
 
     # Then for each fixture_id, we call the create_prediction function
     for fixture in fixtures:
@@ -115,6 +115,6 @@ async def update_all_predictions(db: Session = Depends(get_db)):
             await create_prediction(fixture_id, db)
         except ValueError as e:
             print(f"Could not convert fixture_id to an integer: {fixture['fixture']['id']}")
-            print(f"Error: {e}")
+            traceback.print_exc()
 
     return {"message": "Updated all predictions."}
