@@ -129,4 +129,6 @@ class Prediction_Comparisons(Base):
     prediction_comparison_team_name = Column(String)
     prediction_comparison_type = Column(String)
     prediction_comparison_value = Column(String)
+    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=str('now()'))
+    updated_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=str('now()'))
     prediction = relationship("Predictions")
