@@ -98,6 +98,7 @@ class Predictions(Base):
     id = Column(Integer, primary_key=True)
     fixture_id = Column(Integer, nullable=False)
     predictions_winner_id = Column(Integer)
+    predictions_winner_name = Column(String)
     predictions_winner_comment = Column(String)
     predictions_win_or_draw = Column(Boolean)
     predictions_under_over = Column(Double)
