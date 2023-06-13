@@ -28,7 +28,6 @@ async def create_prediction(fixture_id: int, db: Session = Depends(get_db)):
         response = await client.get(url, params=params, headers=headers)
 
     data = response.json()
-    print(data)
     prediction = data['response'][0]
 
     if db.query(exists().where(models.Predictions.fixture_id == fixture_id)).scalar():
