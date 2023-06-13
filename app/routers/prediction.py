@@ -34,9 +34,12 @@ async def create_prediction(fixture_id: int, db: Session = Depends(get_db)):
         print(f"Prediction with fixture_id {fixture_id} already exists.")
         return {"message": f"Prediction with fixture_id {fixture_id} already exists."}
 
+    home_team_name = prediction['teams']['home']['name']
+    away_team_name = prediction['teams']['away']['name']
+
     pred_row = {
         'fixture_id': fixture_id,
-        'predictions_winner_id': prediction.get('predictions', {}).get('winner', {}).get('id'),
+        'predictions_winner_id': prediction['predictions']['winner']['id'],
         'predictions_winner_comment': prediction.get('predictions', {}).get('winner', {}).get('comment'),
         'predictions_win_or_draw': prediction.get('predictions', {}).get('win_or_draw'),
         'predictions_under_over': prediction.get('predictions', {}).get('under_over'),
@@ -68,7 +71,7 @@ async def create_prediction(fixture_id: int, db: Session = Depends(get_db)):
             comp_row = {
                 'prediction_id': prediction_id,
                 'fixture_id': fixture_id,
-                'prediction_comparison_team_name': team,
+                'prediction_comparison_team_name': home_team_name if team == "home" else away_team_name,
                 'prediction_comparison_type': comparison_type,
                 'prediction_comparison_value': value
             }
