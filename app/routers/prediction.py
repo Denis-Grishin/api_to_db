@@ -13,11 +13,9 @@ router = APIRouter(
     tags=["Predictions"]
 )
 
-
-
 @router.get("/{fixture_id}")
 async def create_prediction(fixture_id: int, db: Session = Depends(get_db)):
-    url = f"https://v3.football.api-sports.io/predictions/{fixture_id}"
+    url = f"https://v3.football.api-sports.io/predictions/"
     params = {
         "fixture": fixture_id
     }
@@ -30,8 +28,6 @@ async def create_prediction(fixture_id: int, db: Session = Depends(get_db)):
 
     data = response.json()
     prediction = data['response']
-    print(data)
-
 
     if db.query(exists().where(models.Predictions.fixture_id == fixture_id)).scalar():
         # Skip if prediction already exists in the database
@@ -43,10 +39,11 @@ async def create_prediction(fixture_id: int, db: Session = Depends(get_db)):
         'predictions_winner_id': prediction['predictions']['winner']['id'],
         'predictions_winner_comment': prediction['predictions']['winner']['comment'],
         'predictions_win_or_draw': prediction['predictions']['win_or_draw'],
-        'predictions_under_over': float(prediction['predictions']['under_over']),
+        'predictions_under_over': prediction['predictions']['under_over'],
         'predictions_goals_home': prediction['predictions']['goals']['home'],
         'predictions_goals_away': prediction['predictions']['goals']['away'],
         'predictions_advice': prediction['predictions']['advice'],
+        'predictions_percent_home': prediction['predictions']['percent']['home'],
         'predictions_percent_draw': prediction['predictions']['percent']['draw'],
         'predictions_percent_away': prediction['predictions']['percent']['away'],
         'league_id': prediction['league']['id'],
