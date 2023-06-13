@@ -105,6 +105,7 @@ async def update_all_predictions(db: Session = Depends(get_db)):
         fixtures_response = await client.get(fixtures_url, params=fixtures_params, headers=fixtures_headers)
 
     fixtures_data = fixtures_response.json()
+    print("Fixtures API response data:", fixtures_data)
     fixtures = fixtures_data.get('response', [])
 
     # Then for each fixture_id, we call the create_prediction function
