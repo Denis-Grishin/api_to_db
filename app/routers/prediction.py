@@ -14,7 +14,7 @@ router = APIRouter(
     tags=["Predictions"]
 )
 
-@router.get("/{fixture_id}")
+#@router.get("/{fixture_id}")
 async def create_prediction(fixture_id: int, db: Session = Depends(get_db)):
     url = f"https://v3.football.api-sports.io/predictions/"
     params = {
