@@ -14,7 +14,7 @@ router = APIRouter(
     tags=["Predictions"]
 )
 
-@router.get("/{fixture_id}")
+#@router.get("/{fixture_id}")
 async def create_prediction(fixture_id: int, db: Session = Depends(get_db)):
     url = f"https://v3.football.api-sports.io/predictions/"
     params = {
@@ -28,6 +28,7 @@ async def create_prediction(fixture_id: int, db: Session = Depends(get_db)):
         response = await client.get(url, params=params, headers=headers)
 
     data = response.json()
+    print(data)
     prediction = data['response'][0]
 
     if db.query(exists().where(models.Predictions.fixture_id == fixture_id)).scalar():
