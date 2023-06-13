@@ -104,7 +104,7 @@ class Predictions(Base):
     predictions_goals_home = Column(String)
     predictions_goals_away = Column(String)
     predictions_advice = Column(String)
-    predictions_percent_draw = Column(String
+    predictions_percent_draw = Column(String)
     predictions_percent_away = Column(String)
     league_id = Column(Integer)
     league_name = Column(String)
