@@ -27,6 +27,8 @@ async def create_prediction(fixture_id: int, db: Session = Depends(get_db)):
 
     data = response.json()
     prediction = data['response']
+    print(prediction)
+
 
     if db.query(exists().where(models.Predictions.fixture_id == fixture_id)).scalar():
         # Skip if prediction already exists in the database
