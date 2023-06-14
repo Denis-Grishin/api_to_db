@@ -123,7 +123,7 @@ class Predictions(Base):
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=str('now()'))
     updated_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=str('now()'))
 
-class Prediction_Comparisons(Base):
+class PredictionComparisons(Base):
     __tablename__ = 'api_football_prediction_comparisons'
     id = Column(Integer, primary_key=True)
     prediction_id = Column(Integer, ForeignKey("api_football_predictions.id", ondelete="CASCADE"), nullable=False)
