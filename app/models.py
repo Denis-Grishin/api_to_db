@@ -69,6 +69,14 @@ class Fixture(Base):
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=str('now()'))
     updated_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=str('now()'))
 
+class FixtureStatistics(Base):
+    __tablename__ = 'api_football_fixture_statistics'
+    id = Column(Integer, primary_key=True)
+    fixture_id = Column(Integer, nullable=False)
+    statistics_team_name = Column(String)
+    statistics_type = Column(String)
+    statistics_value = Column(String)
+
 class Injuries(Base):
     __tablename__ = 'api_football_injuries'
     id = Column(Integer, primary_key=True)

@@ -13,6 +13,7 @@ router = APIRouter(
     tags=["Fixtures"]
 )
 
+#add fixtures to database
 @router.get("/{league_id}")
 async def create_fixture(league_id: int, db: Session = Depends(get_db)):
     url = "https://v3.football.api-sports.io/fixtures"
@@ -102,6 +103,50 @@ async def create_fixture(league_id: int, db: Session = Depends(get_db)):
     return {"message": f"Inserted {num_rows} rows into the database."}
 
 
+#add fixture statistics to DB
+@router.get("/statistics/{fixture_id}")
+async def create_fixture_statistics(fixture_id: int, db: Session = Depends(get_db)):
+    url = f"https://v3.football.api-sports.io/fixtures/statistics"
+    params = {
+        "fixture": fixture_id
+    }
+    headers = {
+        "x-apisports-key": "6a2ebf0bfe57befbe03765041d991643"
+    }
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url, params=params, headers=headers)
+
+    data = response.json()
+    response_data = data['response']
+
+    rows = []
+
+    for team_stats in response_data:
+        team_name = team_stats['team']['name']
+        statistics = team_stats['statistics']
+
+        for stat in statistics:
+            stat_type = stat['type']
+            stat_value = stat['value']
+
+            row = {
+                'fixture_id': fixture_id,
+                'statistics_team_name': team_name,
+                'statistics_type': stat_type,
+                'statistics_value': str(stat_value)
+            }
+
+            rows.append(row)
+
+    db.bulk_insert_mappings(models.FixtureStatistics, rows)
+    db.commit()
+
+    num_rows = len(rows)
+    print(f"Inserted {num_rows} rows into the database.")
+
+    return {"message": f"Inserted {num_rows} rows into the database."}
+#####
 
 #update fixtures table with in progress fixtures data
 @router.get("/")
