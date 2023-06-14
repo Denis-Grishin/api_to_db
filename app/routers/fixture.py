@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import exists 
 from .. import models, schemas, utils
 from ..database import get_db
+from ..config import settings
 
 router = APIRouter(
     prefix="/fixtures", 
@@ -23,7 +24,7 @@ async def create_fixture(league_id: int, db: Session = Depends(get_db)):
         "season": "2022"
     }
     headers = {
-        "x-apisports-key": "6a2ebf0bfe57befbe03765041d991643"
+        "x-apisports-key": {settings.api_football_key}
     }
 
     async with httpx.AsyncClient() as client:
