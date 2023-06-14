@@ -144,9 +144,9 @@ async def create_fixture_statistics(fixture_id: int, db: Session = Depends(get_d
     db.commit()
 
     num_rows = len(rows)
-    print(f"Inserted {num_rows} rows into the database.")
+    print(f"Inserted {num_rows} rows into Fixture Stastic table.")
 
-    return {"message": f"Inserted {num_rows} rows into the database."}
+    return {"message": f"Inserted {num_rows} rows into Fixture Stastic table"}
 #####
 
 #add batch statistics to Db
@@ -157,8 +157,7 @@ async def update_all_statistics(league_id: int, db: Session = Depends(get_db)):
     fixtures_url = "https://v3.football.api-sports.io/fixtures"
     fixtures_params = {
         "league": league_id,
-        "season": "2022",
-        "date": "2023-05-28"
+        "season": "2022"
     }
     fixtures_headers = {
         "x-apisports-key": "6a2ebf0bfe57befbe03765041d991643"
