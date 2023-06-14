@@ -106,7 +106,7 @@ async def create_fixture(league_id: int, db: Session = Depends(get_db)):
 
 
 #add one fixture statistics to DB
-#@router.get("/statistics/{fixture_id}")
+@router.get("/statistics/{fixture_id}")
 async def create_fixture_statistics(fixture_id: int, db: Session = Depends(get_db)):
     url = f"https://v3.football.api-sports.io/fixtures/statistics"
     params = {
