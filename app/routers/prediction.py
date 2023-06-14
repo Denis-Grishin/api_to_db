@@ -67,6 +67,7 @@ async def create_prediction(fixture_id: int, db: Session = Depends(get_db)):
     }
 
     prediction_id = db.execute(insert(models.Predictions).values(**pred_row).returning(models.Predictions.id)).scalar_one()
+    print(f"Inserted a row with prediction_id: {prediction_id} and fixture_id: {fixture_id} into Predictions table.")
 
     comp_rows = []
     for comparison_type, comparison_values in prediction['comparison'].items():
@@ -108,6 +109,7 @@ async def create_prediction(fixture_id: int, db: Session = Depends(get_db)):
     db.execute(insert(models.PredictionComparisons).values(comp_rows))
 
     db.commit()
+    print(f"Inserted {len(comp_rows)} rows with prediction_id: {prediction_id} and fixture_id: {fixture_id} into PredictionComparisons table.")
     return {"message": "Prediction created successfully!"}
 
 @router.get("/updateall")
