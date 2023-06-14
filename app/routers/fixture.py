@@ -180,7 +180,7 @@ async def update_all_statistics(league_id: int, db: Session = Depends(get_db)):
             print(f"Could not convert fixture_id to an integer: {fixture['fixture']['id']}")
             #traceback.print_exc()
 
-    return {"message": "Updated all statistis for league: {league_id}."}
+    return {"message": f"Updated all statistis for league: {league_id}."}
 
 
 
