@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import exists, insert 
 from .. import models, schemas, utils
 from ..database import get_db
+from ..config import settings
 import traceback
 
 router = APIRouter(
@@ -15,14 +16,14 @@ router = APIRouter(
     tags=["Predictions"]
 )
 
-#@router.get("/{fixture_id}")
+@router.get("/{fixture_id}")
 async def create_prediction(fixture_id: int, db: Session = Depends(get_db)):
     url = f"https://v3.football.api-sports.io/predictions/"
     params = {
         "fixture": fixture_id
     }
     headers = {
-        "x-apisports-key": "6a2ebf0bfe57befbe03765041d991643"
+        "x-apisports-key": {settings.api_football_key}
     }
 
     async with httpx.AsyncClient() as client:
