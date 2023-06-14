@@ -80,25 +80,35 @@ async def create_prediction(fixture_id: int, db: Session = Depends(get_db)):
             }
             comp_rows.append(comp_row)
 
-    team_stats = ['win_totals', 'draw_totals', 'loses_totals', 'goals_for_totals', 'goals_against_totals']
+    team_stats = ['wins', 'draws', 'loses', 'goals_for_totals', 'goals_against_totals']
+
     for team_stat in team_stats:
         for team in ['home', 'away']:
-            comp_row = {
-                'prediction_id': prediction_id,
-                'fixture_id': fixture_id,
-                'prediction_comparison_team_name': home_team_name if team == "home" else away_team_name,
-                'prediction_comparison_type': team_stat,
-                'prediction_comparison_value': prediction['teams'][team]['league']['fixtures'][team_stat] if team_stat in ['win_totals', 'draw_totals', 'loses_totals'] else prediction['teams'][team]['league']['goals'][team_stat.split('_')[0]]['total']['total']
-            }
-            comp_rows.append(comp_row)
+            team_name = prediction['teams'][team]['name']
+            if team_stat in ['wins', 'draws', 'loses']:
+                comp_row = {
+                    'prediction_id': prediction_id,
+                    'fixture_id': fixture_id,
+                    'prediction_comparison_team_name': team_name,
+                    'prediction_comparison_type': team_stat + '_totals',
+                    'prediction_comparison_value': prediction['teams'][team]['league']['fixtures'][team_stat]['total']
+                }
+                comp_rows.append(comp_row)
+            elif team_stat in ['goals_for_totals', 'goals_against_totals']:
+                direction = 'for' if 'for' in team_stat else 'against'
+                comp_row = {
+                    'prediction_id': prediction_id,
+                    'fixture_id': fixture_id,
+                    'prediction_comparison_team_name': team_name,
+                    'prediction_comparison_type': team_stat,
+                    'prediction_comparison_value': prediction['teams'][team]['league']['goals'][direction]['total']['total']
+                }
+                comp_rows.append(comp_row)
 
-    db.bulk_insert_mappings(models.Prediction_Comparisons, comp_rows)
+    db.execute(insert(models.PredictionComparisons).values(comp_rows))
+
     db.commit()
-
-    num_rows = len(comp_rows) + 1  # +1 for the prediction row
-    print(f"Inserted {num_rows} rows into the database.")
-
-    return {"message": f"Inserted {num_rows} rows into the database."}
+    return {"message": "Prediction created successfully!"}
 
 @router.get("/updateall")
 async def update_all_predictions(db: Session = Depends(get_db)):
