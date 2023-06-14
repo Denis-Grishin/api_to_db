@@ -150,7 +150,7 @@ async def create_fixture_statistics(fixture_id: int, db: Session = Depends(get_d
 #####
 
 #add batch statistics to Db
-@router.get("/uploadstatistics/?league={league_id}&season={season}")
+@router.get("/uploadstatistics?league={league_id}&season={season}")
 async def update_all_statistics(league_id: int, season:int, db: Session = Depends(get_db)):
     # First we get all the fixture_ids
     print(f"Getting all fixture_ids for league_id: {league_id} and season: {season}")
