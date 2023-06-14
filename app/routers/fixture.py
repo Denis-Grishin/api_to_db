@@ -150,14 +150,14 @@ async def create_fixture_statistics(fixture_id: int, db: Session = Depends(get_d
 #####
 
 #add batch statistics to Db
-@router.get("/uploadstatistics/{league_id}/{season}")
+@router.get("/uploadstatistics/{league_id}")
 async def update_all_statistics(league_id: int, season: int, db: Session = Depends(get_db)):
     # First we get all the fixture_ids
     print(f"Getting all fixture_ids for league_id: {league_id} and season: {season}")
     fixtures_url = "https://v3.football.api-sports.io/fixtures"
     fixtures_params = {
         "league": league_id,
-        "season": season,
+        "season": "2022",
         "date": "2023-05-28"
     }
     fixtures_headers = {
