@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
 import httpx
@@ -103,7 +104,7 @@ async def create_fixture(league_id: int, db: Session = Depends(get_db)):
     return {"message": f"Inserted {num_rows} rows into the database."}
 
 
-#add fixture statistics to DB
+#add one fixture statistics to DB
 @router.get("/statistics/{fixture_id}")
 async def create_fixture_statistics(fixture_id: int, db: Session = Depends(get_db)):
     url = f"https://v3.football.api-sports.io/fixtures/statistics"
@@ -148,8 +149,43 @@ async def create_fixture_statistics(fixture_id: int, db: Session = Depends(get_d
     return {"message": f"Inserted {num_rows} rows into the database."}
 #####
 
+
+@router.get("/uploadstatistics")
+async def update_all_statistics(db: Session = Depends(get_db)):
+    # First we get all the fixture_ids
+    fixtures_url = "https://v3.football.api-sports.io/fixtures"
+    fixtures_params = {
+        "league": "39",
+        "season": "2022",
+        "date": "2023-05-28"
+    }
+    fixtures_headers = {
+        "x-apisports-key": "6a2ebf0bfe57befbe03765041d991643"
+    }
+
+    async with httpx.AsyncClient() as client:
+        fixtures_response = await client.get(fixtures_url, params=fixtures_params, headers=fixtures_headers)
+
+    fixtures_data = fixtures_response.json()
+    fixtures = fixtures_data.get('response', [])
+
+    # Then for each fixture_id, we call the create_prediction function
+    for fixture in fixtures:
+        try:
+            fixture_id = int(fixture['fixture']['id'])
+            print(f"Processing fixture_id: {fixture_id}")
+            await asyncio.sleep(1)  # Add this line to introduce a 1-second delay
+            await create_fixture_statistics(fixture_id, db)
+        except ValueError as e:
+            print(f"Could not convert fixture_id to an integer: {fixture['fixture']['id']}")
+            #traceback.print_exc()
+
+    return {"message": "Updated all predictions."}
+
+
+
 #update fixtures table with in progress fixtures data
-@router.get("/")
+@router.get("/update_fixtures")
 async def update_fixtures(db: Session = Depends(get_db)):
     url = "https://v3.football.api-sports.io/fixtures"
     params = {
