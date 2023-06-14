@@ -15,7 +15,7 @@ router = APIRouter(
     tags=["Predictions"]
 )
 
-@router.get("/{fixture_id}")
+#@router.get("/{fixture_id}")
 async def create_prediction(fixture_id: int, db: Session = Depends(get_db)):
     url = f"https://v3.football.api-sports.io/predictions/"
     params = {
@@ -112,14 +112,14 @@ async def create_prediction(fixture_id: int, db: Session = Depends(get_db)):
     print(f"Inserted {len(comp_rows)} rows with prediction_id: {prediction_id} and fixture_id: {fixture_id} into PredictionComparisons table.")
     return {"message": "Prediction created successfully!"}
 
-@router.get("/updateall")
-async def update_all_predictions(db: Session = Depends(get_db)):
+@router.get("/uploadpredictions/{league_id}")
+async def update_all_predictions(league_id: int, db: Session = Depends(get_db)):
     # First we get all the fixture_ids
+    print(f"Getting all fixture_ids for league_id: {league_id}")
     fixtures_url = "https://v3.football.api-sports.io/fixtures"
     fixtures_params = {
-        "league": "39",
-        "season": "2022",
-        "date": "2023-05-28"
+        "league": league_id,
+        "season": "2022"
     }
     fixtures_headers = {
         "x-apisports-key": "6a2ebf0bfe57befbe03765041d991643"
