@@ -1,6 +1,6 @@
 import asyncio
 import datetime
-from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
+from fastapi import FastAPI, Query, Response, status, HTTPException, Depends, APIRouter
 import httpx
 import schedule
 import time
@@ -150,8 +150,8 @@ async def create_fixture_statistics(fixture_id: int, db: Session = Depends(get_d
 #####
 
 #add batch statistics to Db
-@router.get("/uploadstatistics?league={league_id}&season={season}")
-async def update_all_statistics(league_id: int, season:int, db: Session = Depends(get_db)):
+@router.get("/uploadstatistics/league={league_id}&season={season}")
+async def update_all_statistics(league_id: int = Query(...), season: int = Query(...), db: Session = Depends(get_db)):
     # First we get all the fixture_ids
     print(f"Getting all fixture_ids for league_id: {league_id} and season: {season}")
     fixtures_url = "https://v3.football.api-sports.io/fixtures"
