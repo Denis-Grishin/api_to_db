@@ -36,6 +36,7 @@ async def create_prediction(fixture_id: int, db: Session = Depends(get_db)):
         print(f"Prediction with fixture_id {fixture_id} already exists.")
         return {"message": f"Prediction with fixture_id {fixture_id} already exists."}
 
+    print(f"Processing predictions with fixture_id {fixture_id}.")
     home_team_name = prediction['teams']['home']['name']
     away_team_name = prediction['teams']['away']['name']
 
