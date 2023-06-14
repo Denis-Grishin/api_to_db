@@ -14,8 +14,8 @@ router = APIRouter(
     tags=["Predictions"]
 )
 
-#@router.get("/{fixture_id}")
-async def create_prediction(fixture_id: int, db: Session = Depends(get_db)):
+@router.get("/{fixture_id}")
+async def create_prediction(fixture_id: int, db: Session):
     url = f"https://v3.football.api-sports.io/predictions/"
     params = {
         "fixture": fixture_id
@@ -79,6 +79,18 @@ async def create_prediction(fixture_id: int, db: Session = Depends(get_db)):
             }
             comp_rows.append(comp_row)
 
+    team_stats = ['win_totals', 'draw_totals', 'loses_totals', 'goals_for_totals', 'goals_against_totals']
+    for team_stat in team_stats:
+        for team in ['home', 'away']:
+            comp_row = {
+                'prediction_id': prediction_id,
+                'fixture_id': fixture_id,
+                'prediction_comparison_team_name': home_team_name if team == "home" else away_team_name,
+                'prediction_comparison_type': team_stat,
+                'prediction_comparison_value': prediction['teams'][team]['league']['fixtures'][team_stat] if team_stat in ['win_totals', 'draw_totals', 'loses_totals'] else prediction['teams'][team]['league']['goals'][team_stat.split('_')[0]]['total']['total']
+            }
+            comp_rows.append(comp_row)
+
     db.bulk_insert_mappings(models.Prediction_Comparisons, comp_rows)
     db.commit()
 
@@ -86,11 +98,6 @@ async def create_prediction(fixture_id: int, db: Session = Depends(get_db)):
     print(f"Inserted {num_rows} rows into the database.")
 
     return {"message": f"Inserted {num_rows} rows into the database."}
-
-
-import asyncio  # Add this import to your list of imports
-
-
 
 @router.get("/updateall")
 async def update_all_predictions(db: Session = Depends(get_db)):
@@ -109,7 +116,6 @@ async def update_all_predictions(db: Session = Depends(get_db)):
         fixtures_response = await client.get(fixtures_url, params=fixtures_params, headers=fixtures_headers)
 
     fixtures_data = fixtures_response.json()
-    print("Fixtures API response data:", fixtures_data)
     fixtures = fixtures_data.get('response', [])
 
     # Then for each fixture_id, we call the create_prediction function
