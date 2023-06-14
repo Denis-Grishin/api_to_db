@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import exists 
 from .. import models, schemas, utils
 from ..database import get_db
+from ..config import settings
 
 router = APIRouter(
     prefix="/injuries", 
@@ -21,7 +22,7 @@ async def create_injury(league_id: int, db: Session = Depends(get_db)):
         "season": "2022"
     }
     headers = {
-        "x-apisports-key": "6a2ebf0bfe57befbe03765041d991643"
+        "x-apisports-key": f"{settings.api_football_key}"
     }
 
     async with httpx.AsyncClient() as client:

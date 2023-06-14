@@ -123,7 +123,7 @@ async def update_all_predictions(league_id: int, db: Session = Depends(get_db)):
         "season": "2022"
     }
     fixtures_headers = {
-        "x-apisports-key": "6a2ebf0bfe57befbe03765041d991643"
+        "x-apisports-key": f"{settings.api_football_key}"
     }
 
     async with httpx.AsyncClient() as client:
