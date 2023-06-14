@@ -90,6 +90,8 @@ async def create_prediction(fixture_id: int, db: Session = Depends(get_db)):
 
 import asyncio  # Add this import to your list of imports
 
+
+
 @router.get("/updateall")
 async def update_all_predictions(db: Session = Depends(get_db)):
     # First we get all the fixture_ids
@@ -119,6 +121,6 @@ async def update_all_predictions(db: Session = Depends(get_db)):
             await create_prediction(fixture_id, db)
         except ValueError as e:
             print(f"Could not convert fixture_id to an integer: {fixture['fixture']['id']}")
-            traceback.print_exc()
+            #traceback.print_exc()
 
     return {"message": "Updated all predictions."}
