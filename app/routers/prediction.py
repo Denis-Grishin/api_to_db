@@ -134,13 +134,13 @@ async def update_all_predictions(league_id: int, db: Session = Depends(get_db)):
 
     # Then for each fixture_id, we call the create_prediction function
     for fixture in fixtures:
-        try:
+        #try:
             fixture_id = int(fixture['fixture']['id'])
             print(f"Processing fixture_id: {fixture_id}")
-            await asyncio.sleep(1)  # Add this line to introduce a 1-second delay
+            await asyncio.sleep(2)  # Add this line to introduce a 1-second delay
             await create_prediction(fixture_id, db)
-        except ValueError as e:
-            print(f"Could not convert fixture_id to an integer: {fixture['fixture']['id']}")
+        #except ValueError as e:
+        #   print(f"Could not convert fixture_id to an integer: {fixture['fixture']['id']}")
             #traceback.print_exc()
 
     return {"message": "Updated all predictions."}
