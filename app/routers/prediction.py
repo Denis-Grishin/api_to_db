@@ -23,7 +23,7 @@ async def create_prediction(fixture_id: int, db: Session = Depends(get_db)):
         "fixture": fixture_id
     }
     headers = {
-        "x-apisports-key": {settings.api_football_key}
+        "x-apisports-key": f"{settings.api_football_key}"
     }
 
     async with httpx.AsyncClient() as client:
