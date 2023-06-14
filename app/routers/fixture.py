@@ -150,13 +150,13 @@ async def create_fixture_statistics(fixture_id: int, db: Session = Depends(get_d
 #####
 
 #add batch statistics to Db
-@router.get("/uploadstatistics/{league_id}")
-async def update_all_statistics(league_id: int, db: Session = Depends(get_db)):
+@router.get("/uploadstatistics/?league={league_id}&season={season}")
+async def update_all_statistics(league_id: int, season:int, db: Session = Depends(get_db)):
     # First we get all the fixture_ids
     fixtures_url = "https://v3.football.api-sports.io/fixtures"
     fixtures_params = {
         "league": league_id,
-        "season": "2022",
+        "season": season,
         "date": "2023-05-28"
     }
     fixtures_headers = {
@@ -180,7 +180,7 @@ async def update_all_statistics(league_id: int, db: Session = Depends(get_db)):
             print(f"Could not convert fixture_id to an integer: {fixture['fixture']['id']}")
             #traceback.print_exc()
 
-    return {"message": "Updated all predictions."}
+    return {"message": "Updated all statistis for league: {league_id}."}
 
 
 
