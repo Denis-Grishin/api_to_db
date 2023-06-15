@@ -139,15 +139,22 @@ async def create_fixture_statistics(fixture_id: int, db: Session = Depends(get_d
                 'statistics_value': str(stat_value)
             }
 
-            rows.append(row)
+            # Checking if the record already exists in the database
+            existing_record = db.query(models.FixtureStatistics).filter_by(fixture_id=row['fixture_id'], 
+                                                                           statistics_team_name=row['statistics_team_name'], 
+                                                                           statistics_type=row['statistics_type']).first()
+            if existing_record is None:
+                rows.append(row)
 
-    db.bulk_insert_mappings(models.FixtureStatistics, rows)
-    db.commit()
+    if rows:  # If rows is not empty, i.e., there are new records
+        db.bulk_insert_mappings(models.FixtureStatistics, rows)
+        db.commit()
 
     num_rows = len(rows)
     print(f"Inserted {num_rows} rows into Fixture Stastic table.")
 
     return {"message": f"Inserted {num_rows} rows into Fixture Stastic table"}
+
 #####
 
 #add batch statistics to Db
