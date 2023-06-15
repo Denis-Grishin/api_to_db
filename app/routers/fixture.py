@@ -184,7 +184,7 @@ async def update_all_statistics(league_id: int, db: Session = Depends(get_db)):
         try:
             fixture_id = int(fixture['fixture']['id'])
             print(f"Processing fixture_id: {fixture_id}")
-            await asyncio.sleep(2)  # Add this line to introduce a 1-second delay
+            await asyncio.sleep(1)  # Add this line to introduce a 1-second delay
             await create_fixture_statistics(fixture_id, db)
             print(f"Processed rows: {i+1}/{total_rows}")
         except ValueError as e:
