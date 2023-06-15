@@ -157,7 +157,6 @@ async def create_fixture_statistics(fixture_id: int, db: Session = Depends(get_d
 
 #####
 
-#add batch statistics to Db
 @router.get("/uploadstatistics/{league_id}")
 async def update_all_statistics(league_id: int, db: Session = Depends(get_db)):
     # First we get all the fixture_ids
@@ -177,16 +176,19 @@ async def update_all_statistics(league_id: int, db: Session = Depends(get_db)):
     fixtures_data = fixtures_response.json()
     fixtures = fixtures_data.get('response', [])
 
+    total_rows = len(fixtures)
+    print(f"Total rows to be processed: {total_rows}")
+
     # Then for each fixture_id, we call the create_prediction function
-    for fixture in fixtures:
+    for i, fixture in enumerate(fixtures):
         try:
             fixture_id = int(fixture['fixture']['id'])
             print(f"Processing fixture_id: {fixture_id}")
-            await asyncio.sleep(1)  # Add this line to introduce a 1-second delay
+            await asyncio.sleep(2)  # Add this line to introduce a 1-second delay
             await create_fixture_statistics(fixture_id, db)
+            print(f"Processed rows: {i+1}/{total_rows}")
         except ValueError as e:
             print(f"Could not convert fixture_id to an integer: {fixture['fixture']['id']}")
-            #traceback.print_exc()
 
     return {"message": f"Updated all statistis for league: {league_id}."}
 
