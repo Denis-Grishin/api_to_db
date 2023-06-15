@@ -21,7 +21,7 @@ async def create_fixture(league_id: int, db: Session = Depends(get_db)):
     url = "https://v3.football.api-sports.io/fixtures"
     params = {
         "league": league_id,
-        "season": "2019"
+        "season": "2018"
     }
     headers = {
         "x-apisports-key": f"{settings.api_football_key}"
