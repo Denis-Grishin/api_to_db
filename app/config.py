@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     algorithm: str
     access_token_expire_minutes: int
     api_football_key: str
+    openai_api_key: str
 
     class Config:
         env_file = ".env"

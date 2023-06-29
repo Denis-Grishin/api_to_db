@@ -2,10 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from . import models
 from .database import engine
-from .routers import user, post, fixture, auth, injuries, vote, prediction
+from .routers import user, post, fixture, auth, injuries, vote, prediction, chat
 from .config import settings
-
-
 
 print(settings.database_name)
 
@@ -32,6 +30,7 @@ app.include_router(auth.router)
 app.include_router(injuries.router)
 app.include_router(vote.router)
 app.include_router(prediction.router)
+app.include_router(chat.router)
 
 @app.get("/")
 def read_root():
