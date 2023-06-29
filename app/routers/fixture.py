@@ -164,7 +164,7 @@ async def update_all_statistics(league_id: int, db: Session = Depends(get_db)):
     fixtures_url = "https://v3.football.api-sports.io/fixtures"
     fixtures_params = {
         "league": league_id,
-        "season": "2022"
+        "season": "2023"
     }
     fixtures_headers = {
         "x-apisports-key": f"{settings.api_football_key}"
