@@ -19,7 +19,7 @@ async def create_injury(league_id: int, db: Session = Depends(get_db)):
     url = "https://v3.football.api-sports.io/injuries"
     params = {
         "league": league_id,
-        "season": "2022"
+        "season": "2023"
     }
     headers = {
         "x-apisports-key": f"{settings.api_football_key}"
