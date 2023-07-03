@@ -1,20 +1,21 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from . import models
 from .database import engine
 from .routers import user, post, fixture, auth, injuries, vote, prediction
 from .config import settings
-
-
+import os
 
 print(settings.database_name)
 
-#create tables in DB defined in .models
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-#CORS middleware
+templates = Jinja2Templates(directory="templates")
+
 origins = ["*"]
 
 app.add_middleware(
@@ -33,7 +34,6 @@ app.include_router(injuries.router)
 app.include_router(vote.router)
 app.include_router(prediction.router)
 
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to my API!!!!!!!!!"}
-
+@app.get("/", response_class=HTMLResponse)
+async def read_root(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
