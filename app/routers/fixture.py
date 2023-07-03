@@ -15,7 +15,7 @@ router = APIRouter(
     tags=["Fixtures"]
 )
 
-#add fixtures to database
+#add fuxtires to DB
 @router.get("/{league_id}")
 async def create_fixture(league_id: int, db: Session = Depends(get_db)):
     url = "https://v3.football.api-sports.io/fixtures"
@@ -33,17 +33,14 @@ async def create_fixture(league_id: int, db: Session = Depends(get_db)):
     data = response.json()
     fixtures = data['response']
 
-    existing_fixture_ids = set(db.query(models.Fixture.fixture_id).all())
-    rows = []
+    num_rows_inserted = 0
+    num_rows_updated = 0
 
     for fixture in fixtures:
         fixture_id = fixture['fixture']['id']
 
-        if db.query(exists().where(models.Fixture.fixture_id == fixture_id)).scalar():
-            # Skip if fixture already exists in the database
-            print(f"Fixture with fixture_id {fixture_id} already exists.")
-            continue
-
+        db_fixture = db.query(models.Fixture).filter(models.Fixture.fixture_id == fixture_id).first()
+        
         referee = fixture['fixture']['referee']
         timezone = fixture['fixture']['timezone']
         date = fixture['fixture']['date']
@@ -94,15 +91,30 @@ async def create_fixture(league_id: int, db: Session = Depends(get_db)):
             'status_elapsed': status['elapsed']
         }
 
-        rows.append(row)
+        if db_fixture:
+            # Fixture already exists in the database
+            if db_fixture.status_short != status['short']:
+                # Status has changed, so update the record
+                db.query(models.Fixture).filter(models.Fixture.fixture_id == fixture_id).update(row)
+                db.commit()
+                num_rows_updated += 1
+                print(f"Updated fixture with fixture_id {fixture_id}.")
+            else:
+                # Status has not changed, so skip this fixture
+                print(f"Skipped fixture with fixture_id {fixture_id} - no status change.")
+                continue
+        else:
+            # Fixture does not exist in the database, so insert new record
+            db.add(models.Fixture(**row))
+            db.commit()
+            num_rows_inserted += 1
+            print(f"Inserted new fixture with fixture_id {fixture_id}.")
 
-    db.bulk_insert_mappings(models.Fixture, rows)
-    db.commit()
+    print(f"Inserted {num_rows_inserted} new rows into the database.")
+    print(f"Updated {num_rows_updated} existing rows in the database.")
 
-    num_rows = len(rows)
-    print(f"Inserted {num_rows} rows into the database.")
+    return {"message": f"Inserted {num_rows_inserted} new rows and updated {num_rows_updated} existing rows in the database."}
 
-    return {"message": f"Inserted {num_rows} rows into the database."}
 
 
 #add one fixture statistics to DB
