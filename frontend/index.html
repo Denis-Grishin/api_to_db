@@ -56,6 +56,10 @@
             }
         </style>
 
+    </head>
+    <body>
+
+
     <title>Update Fixtures</title>
     <script>
         async function updateFixtures() {
@@ -67,8 +71,7 @@
             document.getElementById('result').innerHTML = JSON.stringify(data);
         }
     </script>
-    </head>
-    <body>
+
         <h1>Update Fixtures</h1>
         <label for="league_id">League ID:</label><br>
         <input type="text" id="league_id" name="league_id"><br>
@@ -78,5 +81,6 @@
         <div id="result">
             <!-- The result from the server will be displayed here -->
         </div>
+        
     </body>
 </html>
