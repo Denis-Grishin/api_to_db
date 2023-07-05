@@ -4,23 +4,5 @@
   <title>Your Page Title</title>
 </head>
 <body>
-  <div>
-    <label for="league_id">League ID:</label>
-    <input type="text" id="league_id" name="league_id">
-    <button onclick="updateFixtures()">Submit</button>
-  </div>
-
-  <div id="results">
-    <!-- The results from the fetch request will be displayed here -->
-  </div>
-
-  <script>
-    async function updateFixtures() {
-      let league_id = document.getElementById("league_id").value;
-      let response = await fetch(`/fixtures/${league_id}`);
-      let text = await response.text();
-      console.log(text);
-    }
-  </script>
 </body>
 </html>
