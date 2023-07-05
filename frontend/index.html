@@ -1,86 +1,27 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Welcome to my API</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                background-color: #333;
-                color: white;
-                padding: 20px;
-            }
-            form {
-                background-color: #444;
-                padding: 20px;
-                border-radius: 5px;
-                max-width: 400px;
-                margin: auto;
-            }
-            input[type=text] {
-                width: 100%;
-                padding-block: 15px;
-                margin: 5px 0 10px 0;
-                display: inline-block;
-                border: none;
-                border-bottom: 1px solid #888;
-                background-color: #555;
-                color: white;
-            }
-            input[type=submit] {
-                background-color: #888;
-                color: white;
-                padding: 14px 20px;
-                margin: 8px 0;
-                border: none;
-                cursor: pointer;
-                width: 100%;
-                border-radius: 5px;
-            }
-            input[type=submit]:hover {
-                opacity: 0.8;
-            }
-            h2 {
-                text-align: center;
-            }
-            textarea {
-                width: 100%;
-                height: 150px;
-                padding: 12px 20px;
-                box-sizing: border-box;
-                border: 2px solid #ccc;
-                border-radius: 4px;
-                background-color: #555;
-                font-size: 16px;
-                color: white;
-                resize: none;
-            }
-        </style>
+<head>
+  <title>Your Page Title</title>
+</head>
+<body>
+  <div>
+    <label for="league_id">League ID:</label>
+    <input type="text" id="league_id" name="league_id">
+    <button onclick="updateFixtures()">Submit</button>
+  </div>
 
-    </head>
-    <body>
+  <div id="results">
+    <!-- The results from the fetch request will be displayed here -->
+  </div>
 
-
-    <title>Update Fixtures</title>
-    <script>
-        async function updateFixtures() {
-            let league_id = document.getElementById('league_id').value;
-            let response = await fetch(`/fixtures/${league_id}`);
-            let data = await response.json();
-
-            // This will display the JSON response from the server in a div
-            document.getElementById('result').innerHTML = JSON.stringify(data);
-        }
-    </script>
-
-        <h1>Update Fixtures</h1>
-        <label for="league_id">League ID:</label><br>
-        <input type="text" id="league_id" name="league_id"><br>
-        <input type="button" value="Submit" onclick="updateFixtures()">
-    
-        <h2>Result:</h2>
-        <div id="result">
-            <!-- The result from the server will be displayed here -->
-        </div>
-        
-    </body>
+  <script>
+    async function updateFixtures() {
+      let league_id = document.getElementById("league_id").value;
+      let response = await fetch(`/fixtures/${league_id}`);
+      let data = await response.json();
+      console.log(data);
+      document.getElementById("results").innerText = JSON.stringify(data, null, 2); // Format the JSON string in a more human-readable way
+    }
+  </script>
+</body>
 </html>
