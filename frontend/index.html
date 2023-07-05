@@ -55,22 +55,28 @@
                 resize: none;
             }
         </style>
+
+    <title>Update Fixtures</title>
+    <script>
+        async function updateFixtures() {
+            let league_id = document.getElementById('league_id').value;
+            let response = await fetch(`/fixtures/${league_id}`);
+            let data = await response.json();
+
+            // This will display the JSON response from the server in a div
+            document.getElementById('result').innerHTML = JSON.stringify(data);
+        }
+    </script>
     </head>
     <body>
-        <h1>Welcome to my API</h1>
-
-        <form action="/action_page" method="get">
-            <label for="league">League:</label><br>
-            <input type="text" id="league" name="league"><br>
-            <label for="season">Season:</label><br>
-            <input type="text" id="season" name="season"><br><br>
-            <input type="submit" value="Submit">
-        </form>
-
-        <br><br>
-        
-        <h2>Logs:</h2>
-        <textarea id="logs" name="logs" placeholder="Logs will appear here...">
-        </textarea>
+        <h1>Update Fixtures</h1>
+        <label for="league_id">League ID:</label><br>
+        <input type="text" id="league_id" name="league_id"><br>
+        <input type="button" value="Submit" onclick="updateFixtures()">
+    
+        <h2>Result:</h2>
+        <div id="result">
+            <!-- The result from the server will be displayed here -->
+        </div>
     </body>
 </html>
