@@ -18,9 +18,8 @@
     async function updateFixtures() {
       let league_id = document.getElementById("league_id").value;
       let response = await fetch(`/fixtures/${league_id}`);
-      let data = await response.json();
-      console.log(data);
-      document.getElementById("results").innerText = JSON.stringify(data, null, 2); // Format the JSON string in a more human-readable way
+      let text = await response.text();
+      console.log(text);
     }
   </script>
 </body>
