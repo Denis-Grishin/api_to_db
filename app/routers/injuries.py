@@ -31,17 +31,8 @@ async def create_injury(league_id: int, db: Session = Depends(get_db)):
     data = response.json()
     injuries = data['response']
 
-    existing_fixture_ids = set(db.query(models.Injuries.fixture_id).all())
-    rows = []
-
     for injury in injuries:
         fixture_id = injury['fixture']['id']
-
-        if db.query(exists().where(models.Injuries.fixture_id == fixture_id)).scalar():
-            # Skip if fixture already exists in the database
-            print(f"Injurie with fixture_id {fixture_id} already exists.")
-            continue
-
         player_id = injury['player']['id']
         player_name = injury['player']['name']
         player_photo = injury['player']['photo']
@@ -53,7 +44,7 @@ async def create_injury(league_id: int, db: Session = Depends(get_db)):
         fixture_timestamp = injury['fixture']['timestamp']
         fixture_timezone = injury['fixture']['timezone']
 
-        row = {
+        injury_data = {
             'player_id': player_id,
             'player_name': player_name,
             'player_photo': player_photo,
@@ -74,13 +65,19 @@ async def create_injury(league_id: int, db: Session = Depends(get_db)):
             'league_season': league['season'],
         }
 
-        rows.append(row)
+        # Check if fixture already exists in the database
+        injury_in_db = db.query(models.Injuries).filter(models.Injuries.fixture_id == fixture_id).first()
 
-    db.bulk_insert_mappings(models.Injuries, rows)
+        if injury_in_db:
+            # Update the existing injury
+            for key, value in injury_data.items():
+                setattr(injury_in_db, key, value)
+            print(f"Updated injury with fixture_id {fixture_id}.")
+        else:
+            # Insert the new injury
+            db.add(models.Injuries(**injury_data))
+            print(f"Inserted injury with fixture_id {fixture_id}.")
+
     db.commit()
 
-    num_rows = len(rows)
-    print(f"Inserted {num_rows} rows into the database.")
-
-    return {"message": f"Inserted {num_rows} rows into the database."}
-
+    return {"message": "Successfully updated and inserted injuries into the database."}
