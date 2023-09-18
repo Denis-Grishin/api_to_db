@@ -1,10 +1,7 @@
 import datetime
 from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
 import httpx
-import schedule
-import time
 from sqlalchemy.orm import Session
-from sqlalchemy import exists 
 from .. import models, schemas, utils
 from ..database import get_db
 from ..config import settings
@@ -30,6 +27,8 @@ async def create_injury(league_id: int, db: Session = Depends(get_db)):
 
     data = response.json()
     injuries = data['response']
+
+    operation_details = []
 
     for injury in injuries:
         fixture_id = injury['fixture']['id']
@@ -72,12 +71,12 @@ async def create_injury(league_id: int, db: Session = Depends(get_db)):
             # Update the existing injury
             for key, value in injury_data.items():
                 setattr(injury_in_db, key, value)
-            print(f"Updated injury with fixture_id {fixture_id}.")
+            operation_details.append(f"Updated injury with fixture_id {fixture_id}.")
         else:
             # Insert the new injury
             db.add(models.Injuries(**injury_data))
-            print(f"Inserted injury with fixture_id {fixture_id}.")
+            operation_details.append(f"Inserted injury with fixture_id {fixture_id}.")
 
     db.commit()
 
-    return {"message": "Successfully updated and inserted injuries into the database."}
+    return {"message": "Successfully updated and inserted injuries into the database.", "operation_details": operation_details}
