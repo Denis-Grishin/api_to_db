@@ -26,8 +26,13 @@ async def create_prediction(fixture_id: int, db: Session = Depends(get_db)):
         "x-apisports-key": f"{settings.api_football_key}"
     }
 
-    async with httpx.AsyncClient() as client:
-        response = await client.get(url, params=params, headers=headers)
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client: # Set a timeout
+            response = await client.get(url, params=params, headers=headers)
+    except httpx.TimeoutException:
+        print(f"Timeout error while fetching data for fixture_id: {fixture_id}")
+        return {"error": "Timeout error occurred while fetching prediction data"}
+
 
     data = response.json()
     prediction = data['response'][0]
@@ -171,8 +176,12 @@ async def update_all_predictions(league_id: int, db: Session = Depends(get_db)):
         "x-apisports-key": f"{settings.api_football_key}"
     }
 
-    async with httpx.AsyncClient() as client:
-        fixtures_response = await client.get(fixtures_url, params=fixtures_params, headers=fixtures_headers)
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client: # Set a timeout
+            fixtures_response = await client.get(fixtures_url, params=fixtures_params, headers=fixtures_headers)
+    except httpx.TimeoutException:
+        print(f"Timeout error while fetching fixtures for league_id: {league_id}")
+        return {"error": "Timeout error occurred while fetching fixtures data"}
 
     fixtures_data = fixtures_response.json()
     fixtures = fixtures_data.get('response', [])
