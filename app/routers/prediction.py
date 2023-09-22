@@ -194,7 +194,7 @@ async def update_all_predictions(league_id: int, db: Session = Depends(get_db)):
             fixture_id = int(fixture['fixture']['id'])
             fixture_status = fixture['fixture']['status']['short']
             
-            if fixture_status == 'FT':  # Skip fixtures with a status of "FT" (Full Time)
+            if fixture_status != 'FT':  # Skip fixtures with a status of "FT" (Full Time)
                 print(f"Processing fixture_id: {fixture_id} ({i} of {len(fixtures)})")
                 await asyncio.sleep(2)  # Add this line to introduce a 2-second delay
                 await create_prediction(fixture_id, db)
